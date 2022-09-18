@@ -2,26 +2,40 @@ const jsonTable = require('../database/jsonTable');
 
 const usersModel = jsonTable('users');
 
+const { validationResult } = require('express-validator');
+
 module.exports = {
-    index: (req, res) => {
+  index: (req, res) => {
+    let users = usersModel.all();
 
-        let users = usersModel.all()
+    res.render('users/index', { users });
+  },
+  create: (req, res) => {
+    res.render('users/create');
+  },
+  store: (req, res) => {
+    // almacenamos los errores
+    let errors = validationResult(req);
+    // res.send(req.body);
+    // si el objeto errors esta vacio, redirijimos al user creado
 
-        res.render('users/index',  { users });
-    },
-    create: (req, res) => {
-        res.render('users/create');
-    },
-    store: (req, res) => {
-        let user = req.body;
+    if (errors.isEmpty()) {
+      let user = req.body;
 
-        userId = usersModel.create(user);
+      userId = usersModel.create(user);
 
-        res.redirect('/users/' + userId);
-    },
-    show: (req, res) => {
-        let user = usersModel.find(req.params.id);
-
-        res.render('users/detail', { user });
+      res.redirect('/users/' + userId);
+    } else {
+      // sino, imprimimos los errores en en la vista
+      res.render('users/create', {
+        errors: errors.mapped(),
+        old: req.body,
+      });
     }
-}
+  },
+  show: (req, res) => {
+    let user = usersModel.find(req.params.id);
+
+    res.render('users/detail', { user });
+  },
+};
