@@ -2,7 +2,7 @@ const jsonTable = require('../database/jsonTable');
 
 const usersModel = jsonTable('users');
 
-const { validationResult } = require('express-validator');
+const validator = require('../middleware/createFormValidator');
 
 module.exports = {
   index: (req, res) => {
@@ -15,8 +15,8 @@ module.exports = {
   },
   store: (req, res) => {
     // almacenamos los errores
-    let errors = validationResult(req);
-    // res.send(req.body);
+    let errors = validator.validationResult(req);
+    // res.send(errors);
     // si el objeto errors esta vacio, redirijimos al user creado
 
     if (errors.isEmpty()) {
